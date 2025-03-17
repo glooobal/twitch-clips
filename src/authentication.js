@@ -1,7 +1,7 @@
 import axios from 'axios';
 import 'dotenv/config';
 
-import { cache } from '../app.js';
+import { cache } from './app.js';
 
 export const getAccessToken = async () => {
     try {
