@@ -5,6 +5,7 @@ import { getAccessToken } from './authentication.js';
 import { getYesterdayTimeRange } from './utils/date.js';
 
 const STREAMERS_FILE = 'data/streamers.json';
+const STREAMERS_WOMEN_FILE = 'data/streamerki.json';
 const CLIPS_FILE = 'data/clips.json';
 const CLIPS_BLACKLIST_FILE = 'data/clipsBlacklist.json';
 
@@ -12,6 +13,7 @@ const TIME_THRESHOLD = 10 * 60 * 1000; // Time threshold between clips (10 minut
 const MIN_TOTAL_DURATION = 10 * 60 * 1000; // Minimum total duration of clips (7 minutes)
 const MAX_CLIPS_PER_STREAMER = 2; // Maximum number of clips per streamer
 const MIN_VIEWS = 150; // Minimum number of views required for a clip
+const MIN_WOMEN_CLIPS = 3; // Minimum number of clips from women streamers
 
 const loadFile = (filename) => (fs.existsSync(filename) ? JSON.parse(fs.readFileSync(filename)) : []);
 const saveFile = (filename, data) => fs.writeFileSync(filename, JSON.stringify(data, null, 2));
@@ -76,20 +78,32 @@ export const fetchClips = async () => {
     try {
         const accessToken = await getAccessToken();
         const streamers = loadFile(STREAMERS_FILE);
+        const womenStreamers = loadFile(STREAMERS_WOMEN_FILE);
         const { start, end } = getYesterdayTimeRange();
 
         const allClips = (
-            await Promise.all(streamers.map((s) => fetchStreamersClips(s, accessToken, start, end)))
+            await Promise.all(
+                [...streamers, ...womenStreamers].map((s) => fetchStreamersClips(s, accessToken, start, end))
+            )
         ).flat();
 
         allClips.sort((a, b) => b.views - a.views);
 
         let totalDuration = 0;
-        const finalClips = allClips.filter((clip) => {
-            if (totalDuration >= MIN_TOTAL_DURATION) return false;
-            totalDuration += clip.duration;
+        let womenClips = allClips.filter((clip) => womenStreamers.some((ws) => ws.name === clip.streamer));
+        let finalClips = [];
 
-            return true;
+        if (womenClips.length < MIN_WOMEN_CLIPS) {
+            finalClips.push(...womenClips.slice(0, MIN_WOMEN_CLIPS));
+            totalDuration = finalClips.reduce((sum, clip) => sum + clip.duration, 0);
+        }
+
+        allClips.forEach((clip) => {
+            if (totalDuration >= MIN_TOTAL_DURATION) return;
+            if (!finalClips.some((c) => c.id === clip.id)) {
+                finalClips.push(clip);
+                totalDuration += clip.duration;
+            }
         });
 
         saveFile(CLIPS_FILE, finalClips);
