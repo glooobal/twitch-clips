@@ -3,7 +3,7 @@ import path from 'node:path';
 import { exec } from 'child_process';
 
 const CLIPS_FILE = 'data/clips.json';
-const DOWNLOADED_CLIPS_PATH = 'data/downloaded_clips';
+const DOWNLOADED_CLIPS_PATH = 'data/temp/downloaded_clips';
 
 const ensureDirectoryExists = (dir) => {
     if (!fs.existsSync(dir)) {
