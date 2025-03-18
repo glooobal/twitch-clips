@@ -92,7 +92,6 @@ export const fetchClips = async () => {
             return true;
         });
 
-        console.log(totalDuration);
         saveFile(CLIPS_FILE, finalClips);
     } catch (err) {
         console.error('Error fetching clips:', err.response?.data || err);
