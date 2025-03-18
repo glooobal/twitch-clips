@@ -5,30 +5,21 @@ import 'dotenv/config';
 
 import { getAccessToken } from './authentication.js';
 
-const STREAMERS_FILE = 'streamers.json';
+const STREAMERS_FILE = 'data/streamers.json';
+const STREAMERS_BLACKLIST_FILE = 'data/streamersBlacklist.json';
+
 const MIN_VIEWERS = 75;
 
-const loadCurrentStreamers = () => {
-    if (fs.existsSync(STREAMERS_FILE)) {
-        return JSON.parse(fs.readFileSync(STREAMERS_FILE));
-    }
+const loadFile = (filename) => (fs.existsSync(filename) ? JSON.parse(fs.readFileSync(filename)) : []);
+const saveFile = (filename, data) => fs.writeFileSync(filename, JSON.stringify(data, null, 2));
 
-    return [];
-};
-
-const saveToFile = (filename, data) => {
-    try {
-        fs.writeFileSync(filename, JSON.stringify(data, null, 2));
-    } catch (error) {
-        console.error(`Error while saving ${filename}:`, error.message);
-    }
-};
+const BLACKLISTED_STREAMERS = loadFile(STREAMERS_BLACKLIST_FILE);
 
 export const fetchStreamers = async () => {
     try {
         const accessToken = await getAccessToken();
 
-        let currentStreamers = loadCurrentStreamers();
+        let currentStreamers = loadFile(STREAMERS_FILE);
         let newStreamers = [];
         let cursor = null;
 
@@ -56,7 +47,8 @@ export const fetchStreamers = async () => {
             streams.forEach((stream) => {
                 if (
                     stream.viewer_count >= MIN_VIEWERS &&
-                    !currentStreamers.some((s) => s.name.toLowerCase() === stream.user_name.toLowerCase())
+                    !currentStreamers.some((s) => s.name.toLowerCase() === stream.user_name.toLowerCase()) &&
+                    !BLACKLISTED_STREAMERS.includes(stream.user_name)
                 ) {
                     newStreamers.push({
                         id: stream.user_id,
@@ -70,9 +62,9 @@ export const fetchStreamers = async () => {
 
         if (newStreamers.length > 0) {
             currentStreamers = [...currentStreamers, ...newStreamers];
-            saveToFile(STREAMERS_FILE, currentStreamers);
+            saveFile(STREAMERS_FILE, currentStreamers);
         }
     } catch (err) {
-        console.error('Error while fetching streamers:', err.message);
+        console.error('Error while fetching streamers:', err);
     }
 };
