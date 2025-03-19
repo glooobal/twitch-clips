@@ -6,7 +6,7 @@ import { getYesterdayTimeRange } from './utils/date.js';
 
 const STREAMERS_FILE = 'data/streamers.json';
 const STREAMERS_WOMEN_FILE = 'data/streamerki.json';
-const CLIPS_FILE = 'data/clips.json';
+const CLIPS_FILE = 'data/temp/clips.json';
 const CLIPS_BLACKLIST_FILE = 'data/clipsBlacklist.json';
 
 const TIME_THRESHOLD = 10 * 60 * 1000; // Time threshold between clips (10 minutes)
