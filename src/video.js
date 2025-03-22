@@ -2,18 +2,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'child_process';
 
+import { deleteTempFiles } from './utils/temp.js';
+
 const CLIPS_FOLDER = 'data/temp/downloaded_clips';
 const NORMALIZED_FOLDER = 'data/temp/normalized_clips';
 const CLIPS_LIST_PATH = 'data/temp/clips_list.txt';
 
 const OUTPUT_VIDEO_PATH = 'data/final_video.mp4';
 const TRANSITION_PATH = 'data/transition.mp4';
-
-const ensureDirectoryExists = (dirPath) => {
-    if (!fs.existsSync(dirPath)) {
-        fs.mkdirSync(dirPath, { recursive: true });
-    }
-};
 
 const normalizeClips = (clips) => {
     clips.forEach((file, index) => {
@@ -59,13 +55,13 @@ const mergeVideos = (fileListPath) => {
 
 export const createVideo = async () => {
     try {
-        ensureDirectoryExists(NORMALIZED_FOLDER);
+        // const clips = fs.readdirSync(CLIPS_FOLDER).filter((file) => file.endsWith('.mp4'));
+        // await normalizeClips(clips);
 
-        const clips = fs.readdirSync(CLIPS_FOLDER).filter((file) => file.endsWith('.mp4'));
-        await normalizeClips(clips);
+        // const fileListPath = generateFileList();
+        // mergeVideos(fileListPath);
 
-        const fileListPath = generateFileList();
-        mergeVideos(fileListPath);
+        deleteTempFiles();
     } catch (error) {
         console.error('Error while creating the final video:', error);
     }
