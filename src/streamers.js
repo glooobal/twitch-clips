@@ -4,11 +4,12 @@ import fs from 'node:fs';
 import 'dotenv/config';
 
 import { getAccessToken } from './authentication.js';
+import { STREAMER_CONFIG } from './config';
 
 const STREAMERS_FILE = 'data/streamers.json';
 const STREAMERS_BLACKLIST_FILE = 'data/streamersBlacklist.json';
 
-const MIN_VIEWERS = 75;
+const MIN_VIEWERS = STREAMER_CONFIG.MIN_VIEWERS;
 
 const loadFile = (filename) => (fs.existsSync(filename) ? JSON.parse(fs.readFileSync(filename)) : []);
 const saveFile = (filename, data) => fs.writeFileSync(filename, JSON.stringify(data, null, 2));

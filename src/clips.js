@@ -3,17 +3,18 @@ import fs from 'node:fs';
 
 import { getAccessToken } from './authentication.js';
 import { getYesterdayTimeRange } from './utils/date.js';
+import { CLIP_CONFIG } from './config';
 
 const STREAMERS_FILE = 'data/streamers.json';
 const STREAMERS_WOMEN_FILE = 'data/streamerki.json';
 const CLIPS_FILE = 'data/temp/clips.json';
 const CLIPS_BLACKLIST_FILE = 'data/clipsBlacklist.json';
 
-const TIME_THRESHOLD = 10 * 60 * 1000; // Time threshold between clips (10 minutes)
-const MIN_TOTAL_DURATION = 10 * 60 * 1000; // Minimum total duration of clips (7 minutes)
-const MAX_CLIPS_PER_STREAMER = 2; // Maximum number of clips per streamer
-const MIN_VIEWS = 150; // Minimum number of views required for a clip
-const MIN_WOMEN_CLIPS = 3; // Minimum number of clips from women streamers
+const TIME_THRESHOLD = CLIP_CONFIG.TIME_THRESHOLD;
+const MIN_TOTAL_DURATION = CLIP_CONFIG.MIN_TOTAL_DURATION;
+const MAX_CLIPS_PER_STREAMER = CLIP_CONFIG.MAX_CLIPS_PER_STREAMER;
+const MIN_VIEWS = CLIP_CONFIG.MIN_VIEWS;
+const MIN_WOMEN_CLIPS = CLIP_CONFIG.MIN_WOMEN_CLIPS;
 
 const loadFile = (filename) => (fs.existsSync(filename) ? JSON.parse(fs.readFileSync(filename)) : []);
 const saveFile = (filename, data) => fs.writeFileSync(filename, JSON.stringify(data, null, 2));
@@ -100,9 +101,14 @@ export const fetchClips = async () => {
 
         allClips.forEach((clip) => {
             if (totalDuration >= MIN_TOTAL_DURATION) return;
+
             if (!finalClips.some((c) => c.id === clip.id)) {
                 finalClips.push(clip);
                 totalDuration += clip.duration;
+
+                if (totalDuration >= MIN_TOTAL_DURATION) {
+                    return;
+                }
             }
         });
 
