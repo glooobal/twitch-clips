@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import 'dotenv/config';
 
 import { getAccessToken } from './authentication.js';
-import { STREAMER_CONFIG } from './config';
+import { STREAMER_CONFIG } from './config.js';
 
 const STREAMERS_FILE = 'data/streamers.json';
 const STREAMERS_BLACKLIST_FILE = 'data/streamersBlacklist.json';

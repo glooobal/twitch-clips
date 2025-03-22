@@ -3,7 +3,7 @@ import fs from 'node:fs';
 
 import { getAccessToken } from './authentication.js';
 import { getYesterdayTimeRange } from './utils/date.js';
-import { CLIP_CONFIG } from './config';
+import { CLIP_CONFIG } from './config.js';
 
 const STREAMERS_FILE = 'data/streamers.json';
 const STREAMERS_WOMEN_FILE = 'data/streamerki.json';

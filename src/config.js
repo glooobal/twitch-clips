@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 // Clip-related constants
 export const CLIP_CONFIG = {
     TIME_THRESHOLD: 10 * 60 * 1000, // Time threshold between clips (10 minutes)
@@ -10,4 +12,12 @@ export const CLIP_CONFIG = {
 // Streamer-related constants
 export const STREAMER_CONFIG = {
     MIN_VIEWERS: 50
+};
+
+// Folder structure configuration
+export const FOLDER_CONFIG = {
+    DATA_DIR: 'data',
+    TEMP_DIR: path.join('data', 'temp'),
+    DOWNLOADED_CLIPS: path.join('data', 'temp', 'downloaded_clips'),
+    NORMALIZED_CLIPS: path.join('data', 'temp', 'normalized_clips')
 }; 
